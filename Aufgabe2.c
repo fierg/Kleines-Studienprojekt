@@ -21,9 +21,9 @@ main(){
     int length2 = strlen(b);
     
     printf("strlen() lentgh of %s = %d \n", a,length1);
-  	printf("unicode-length of %s = %d \n",a, utf8_strlen(a));
+    printf("unicode-length of %s = %d \n",a, utf8_strlen(a));
 
     printf("strlen() lentgh of %s = %d \n", b,length2);
-	  printf("unicode-length of %s = %d \n",b, utf8_strlen(b));
+    printf("unicode-length of %s = %d \n",b, utf8_strlen(b));
 	
 }
