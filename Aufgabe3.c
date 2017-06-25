@@ -22,6 +22,24 @@ int findSubstring(char *str, char *substr) {
 	 return -1;
 } 
 
+char** getTitleTokens(char* key) {
+        char ** sub_str = malloc(20 * sizeof(char*));
+        for (int i =0 ; i < 10; ++i)
+            sub_str[i] = malloc(30 * sizeof(char));
+
+        int i = 0;
+        char *p = strtok (key, " ");
+
+        while (p != NULL)
+        {
+                sub_str[i++] = p;
+                p = strtok (NULL, "/");
+        }
+        return sub_str;
+}
+
+
+
 int main(){
    FILE *fp;
    char line[1024];
