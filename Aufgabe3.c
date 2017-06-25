@@ -4,6 +4,7 @@
 #include <search.h>
 
 static const int MAX_HASH_SIZE = 5000;
+static const int MIN_ARTICLE_SIZE = 500;
 
 int findSubstring(char *str, char *substr) {
 	int i = 0;
@@ -30,6 +31,7 @@ int main() {
 	char line[1024];
 	int debug = 0;
 
+
 	/* öffne dblp.xml zum lesen */
 	fp = fopen("dblp_smallTest.xml", "r");
 	if (fp == NULL) {
@@ -44,8 +46,9 @@ int main() {
 	 Ist validArticle == 1, so wird bei jeder neuen line statt nach einem "<article" nach einem "<title>" gesucht */
 	int validArticle = 0;
 
-	char *key;
 	char *title;
+	char *key;
+	char lastkey[] = (char*) malloc((128 * sizeof(char));
 
 	/* lies Zeile für Zeile */
 	while (fgets(line, 1024, fp) != NULL) {
@@ -85,6 +88,11 @@ int main() {
 						/* setze das Ende so, dass key nurnoch y enthält und /z weggeschnitten wird */
 						key[findSubstring(key, "/")] = '\0';
 						printf("key: %s\n", key);
+
+						/*int idx = 0;
+						while (*key != '\0')
+						lastkey[idx++] = *ptr++;
+						letzten publisher merken und aktuellen publisher vergleichen. bei neuem publisher hashmap in datei schreiben*/
 
 						/* ab hier enthält key nurnoch den validen Artikelnamen */
 						validArticle = 1;
