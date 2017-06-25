@@ -1,5 +1,8 @@
 #include <stdio.h>
 #include <string.h>
+#include <regex.h>
+
+static const char *PATTERN = "[a-zA-Z]+\\/[a-zA-Z]+\\/[a-zA-Z]+";
 
 int findSubstring(char *str, char *substr) {
      int i = 0;
@@ -35,13 +38,28 @@ char *getSubstringToChar(char *str, char c){
 	out[i] = '\0';
 	return out;
 }
+int
+match(const char *string, char *pattern)
+{
+    int    status;
+    regex_t    re;
+
+    if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB) != 0) {
+        return(0);      /* Report error. */
+    }
+    status = regexec(&re, string, (size_t) 0, NULL, 0);
+    regfree(&re);
+    if (status != 0) {
+        return(0);      /* Report error. */
+    }
+    return(1);
+}
 
 int isValid(char *key){
 	int valid = 1;
-	
+
 	/* TODO: Überprüfe ob key vom Format [a-zA-Z]+/[a-zA-Z]+/[a-zA-Z]+ ist */
-	
-	return valid;
+	return match(key,PATTERN);
 }
 
 int main(){
