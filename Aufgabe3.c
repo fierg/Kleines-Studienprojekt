@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <regex.h>
-
-static const char *PATTERN = "[a-zA-Z]+\\/[a-zA-Z]+\\/[a-zA-Z]+";
+#include <stdlib.h>
 
 int findSubstring(char *str, char *substr) {
      int i = 0;
@@ -24,26 +22,10 @@ int findSubstring(char *str, char *substr) {
 	 return -1;
 } 
 
-int match(char *string, const char *pattern)
-{
-    int    status;
-    regex_t    re;
-
-    if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB) != 0) {
-        return(0);      /* Report error. */
-    }
-    status = regexec(&re, string, (size_t) 0, NULL, 0);
-    regfree(&re);
-    if (status != 0) {
-        return(0);      /* Report error. */
-    }
-    return(1);
-}
-
 int main(){
    FILE *fp;
-   char line[512];
-   int debug = 1;
+   char line[1024];
+   int debug = 0;
 
    /* öffne dblp.xml zum lesen */
    fp = fopen("dblp_smallTest.xml" , "r");
@@ -51,16 +33,18 @@ int main(){
       perror("Error opening file");
       return(-1);
 	}
-	
 	/* TODO: Geeignete Datenstruktur zum speichern von den Keys und den zugehörigen Titeln anlegen */
-	
+
    /* validArticle wird auf 1 gestzt, sobald ein key="x/y/z" Attribut gefunden wurde.
 	  Ist validArticle == 1, so wird bei jeder neuen line statt nach einem "<article" nach einem "<title>" gesucht */
 	int validArticle = 0;
 	
+	char *key;
+	char *title;
+	
    /* lies Zeile für Zeile */
-   while( fgets (line, 512, fp) != NULL ){
-		if(debug)printf("line: %s\n", line);
+   while( fgets (line, 1024, fp) != NULL ){
+		if(debug)printf("line: %s", line);
 		
 		if(!validArticle){
 			/* check for the beginning of an <article> Tag */
@@ -68,25 +52,32 @@ int main(){
 				if(debug)printf("line enthaelt article");
 				
 				/* <article wurde gefunden 
-					finde den index von 'key="' und erhöhe ihn um 5, um die 5 buchstaben key=" zu "überspringen" */
+					finde den index von 'key="' und erhöhe ihn um 5, um die 5 buchstaben key=" zu "überspringen", danach um 9, um journals/ zu überspringen */
 				char *substr = "key=\"";
-				int index = findSubstring(line, substr) + 5;
-				if(debug)printf(", index after key=\": %d\n", index);
+				int index = findSubstring(line, substr) + 5 + 9;
+				if(debug)printf(", index after key=\"journals/: %d\n", index);
 				
 				/* finde den index vom end-tag "> */
 				substr = "\">";
 				int endIndex = findSubstring(line, substr);
 				
+				/* setze den pointer von key auf den ersten Char nach journals/ */
+				key = &line[index];
+				
 				/* setze das Ende des Strings auf das " */
 				line[endIndex] = '\0';
-				
-				/* setze den pointer von key auf den ersten Char des Keys */
-				char *key = &line[index];
-				printf("key: %s\n", key);
-				
+
 				/* überprüfe ob key 3 Teile enthält */
-				if(match(key, PATTERN)){
-					/* falls ja, so wurde ein valider Aritkel gefunden */
+				if(findSubstring(key, "/") == -1){
+					/* no valid key */
+					break;
+				} else {
+					/* key hat das Format x/y/z */
+					/* setze das Ende so, dass key nurnoch y enthält und /z weggeschnitten wird */
+					key[findSubstring(key, "/")] = '\0';
+					printf("key: %s\n", key);
+					
+					/* ab hier enthält key nurnoch den validen Artikelnamen */
 					validArticle = 1;
 				}
 			}
@@ -103,15 +94,26 @@ int main(){
 				line[index] = '\0';
 				
 				/* lasse *title auf den Anfang des Titels zeigen */
-				char *title = &line[7];
+				title = &line[7];
 				printf("title: %s\n", title);
-				
-				/* TODO: Speichere den titel und ordne ihn dem letzten key zu */
 				
 				validArticle = 0;
 				/* setze validArticle wieder auf 0, damit nach "<article" gesucht wird */
+				
+				
+				/* Ab hier enthält Key den gesamten Artikelstring x/y/z und title den zugehörigen Titel */
+				/* tokenize: */
+				char *t = strtok(title, " .,;:<>/\\+*~#'^°!\"§$%&(){}[]?`´|-_");
+				while(t != NULL) {
+					printf("token: %s\n", t);
+					
+					/* TODO: Speichere die Wörter und ordne ihn dem letzten key zu */
+					
+					t = strtok(NULL, " ");
+				}
 			}		
 		}
+		
 	}
    fclose(fp);
    
