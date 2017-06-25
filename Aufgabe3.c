@@ -24,22 +24,7 @@ int findSubstring(char *str, char *substr) {
 	 return -1;
 } 
 
-char *getSubstringToChar(char *str, char c){
-	/* kopiere str in out.
-		benutze den index i und erhöhe ihn mithilfe von str solange, bis ein " gefunden wurde
-		setze das Ende vom kopierten String out auf den gefunden index */
-	int i = 0;
-	char *out;
-	strcpy(out, str);
-	while(*str != c){
-		i++;
-		str++;
-	}
-	out[i] = '\0';
-	return out;
-}
-int
-match(const char *string, char *pattern)
+int match(char *string, const char *pattern)
 {
     int    status;
     regex_t    re;
@@ -53,13 +38,6 @@ match(const char *string, char *pattern)
         return(0);      /* Report error. */
     }
     return(1);
-}
-
-int isValid(char *key){
-	int valid = 1;
-
-	/* TODO: Überprüfe ob key vom Format [a-zA-Z]+/[a-zA-Z]+/[a-zA-Z]+ ist */
-	return match(key,PATTERN);
 }
 
 int main(){
@@ -95,29 +73,44 @@ int main(){
 				int index = findSubstring(line, substr) + 5;
 				if(debug)printf(", index after key=\": %d\n", index);
 				
-				/* wurde ein key gefunden, so extrahiere den substring bis zum nächsten " */
-				if(index != -1){
-					char *key = getSubstringToChar(&line[index], '"');
-					if(debug)printf("key: %s\n", key);
-					
-					/* TODO: implementation von "isValid" */
-					
-					if(isValid(key)){
-						validArticle = 1;
-						/* TODO: key zu journal zuordnen und irgendwo speichern */
-					} else {
-						
-					}
+				/* finde den index vom end-tag "> */
+				substr = "\">";
+				int endIndex = findSubstring(line, substr);
+				
+				/* setze das Ende des Strings auf das " */
+				line[endIndex] = '\0';
+				
+				/* setze den pointer von key auf den ersten Char des Keys */
+				char *key = &line[index];
+				printf("key: %s\n", key);
+				
+				/* überprüfe ob key 3 Teile enthält */
+				if(match(key, PATTERN)){
+					/* falls ja, so wurde ein valider Aritkel gefunden */
+					validArticle = 1;
 				}
 			}
 		}else {
 			if(strstr(line, "<title>") != NULL){
-				/* wurde <title> gefunden, so enthält die nächste zeile den gesamten Titel */
-				char *title = fgets (line, 512, fp);
+				if(debug)printf("title found\n");
+				/* wurde <title> gefunden, so extrahiere den Titel bis </title> */
+				
+				/* finde den index vom </title> tag */
+				char *substr = "</title>";
+				int index = findSubstring(line, substr);
+				
+				/* setze das Ende des Strings auf den letzten Char vorm < */
+				line[index] = '\0';
+				
+				/* lasse *title auf den Anfang des Titels zeigen */
+				char *title = &line[7];
+				printf("title: %s\n", title);
+				
 				/* TODO: Speichere den titel und ordne ihn dem letzten key zu */
-			}
-			/* setze validArticle wieder auf 0, damit nach "<article" gesucht wird */
-			validArticle = 0;
+				
+				validArticle = 0;
+				/* setze validArticle wieder auf 0, damit nach "<article" gesucht wird */
+			}		
 		}
 	}
    fclose(fp);
