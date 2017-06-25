@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <search.h>
+
+#define MAX_HASH_SIZE
 
 int findSubstring(char *str, char *substr) {
      int i = 0;
@@ -52,7 +55,9 @@ int main(){
       return(-1);
 	}
 	/* TODO: Geeignete Datenstruktur zum speichern von den Keys und den zugehörigen Titeln anlegen */
-
+   ENTRY titleToken;
+   ENTRY *searchTitelToken;
+   (void) hcreate(MAX_HASH_SIZE);
    /* validArticle wird auf 1 gestzt, sobald ein key="x/y/z" Attribut gefunden wurde.
 	  Ist validArticle == 1, so wird bei jeder neuen line statt nach einem "<article" nach einem "<title>" gesucht */
 	int validArticle = 0;
@@ -130,6 +135,9 @@ int main(){
 					/* TODO: Speichere die Wörter und ordne ihn dem letzten key zu */
 					
 					t = strtok(NULL, " .,;:<>/\\+*~#'^°!\"§$%&(){}[]?`´|-_");
+					titleToken.key = t;
+					titleToken.data = 1;
+					(void) hsearch (titleToken, ENTER);
 				}
 			}		
 		}
