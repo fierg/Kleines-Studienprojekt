@@ -1,0 +1,92 @@
+<dblp>
+	<article mdate="2015-04-14" key="journals/cacm/Vardi15">
+		<inproceedings key="conf/wsc/CerdaF97" mdate="2015-06-03">
+			<author>Carlos B. Ramirez Cerda</author>
+			<author>Armando J. Espinosa de los Monteros F.</author>
+			<title>
+				Evaluation of a (R, s, Q, c) Multi-Item Inventory Replenishment Policy Through Simulation.
+			</title>
+			<pages>825-831</pages>
+			<year>1997</year>
+			<crossref>conf/wsc/1997</crossref>
+			<booktitle>Winter Simulation Conference</booktitle>
+			<ee>
+				http://doi.ieeecomputersociety.org/10.1109/WSC.1997.640959
+			</ee>
+			<ee>http://doi.acm.org/10.1145/268437.268661</ee>
+			<url>db/conf/wsc/wsc1997.html#CerdaF97</url>
+		</inproceedings>
+	</article>
+	<article mdate="2015-04-14" key="journals/cacm/Vardi7777">
+		<inproceedings key="conf/wsc/CerdaF97" mdate="2015-06-03">
+			<author>Carlos B. Ramirez Cerda</author>
+			<author>Armando J. Espinosa de los Monteros F.</author>
+			<title>
+				Evaluation of some Inventory Policy.
+			</title>
+			<pages>825-831</pages>
+			<year>1997</year>
+			<crossref>conf/wsc/1997</crossref>
+			<booktitle>Winter Simulation Conference</booktitle>
+			<ee>
+				http://doi.ieeecomputersociety.org/10.1109/WSC.1997.640959
+			</ee>
+			<ee>http://doi.acm.org/10.1145/268437.268661</ee>
+			<url>db/conf/wsc/wsc1997.html#CerdaF97</url>
+		</inproceedings>
+	</article>
+	<noArticle mdate="2015-04-14" key="journals/cacm/Vardi7777">
+		<inproceedings key="conf/wsc/CerdaF97" mdate="2015-06-03">
+			<author>Carlos B. Ramirez Cerda</author>
+			<author>Armando J. Espinosa de los Monteros F.</author>
+			<title>
+				Evaluation of some Inventory Policy.
+			</title>
+			<pages>825-831</pages>
+			<year>1997</year>
+			<crossref>conf/wsc/1997</crossref>
+			<booktitle>Winter Simulation Conference</booktitle>
+			<ee>
+				http://doi.ieeecomputersociety.org/10.1109/WSC.1997.640959
+			</ee>
+			<ee>http://doi.acm.org/10.1145/268437.268661</ee>
+			<url>db/conf/wsc/wsc1997.html#CerdaF97</url>
+		</inproceedings>
+	</noArticle>
+	<article mdate="2015-04-14" key="journals/dem">
+		<inproceedings key="conf/wsc/CerdaF97" mdate="2015-06-03">
+			<author>Carlos B. Ramirez Cerda</author>
+			<author>Armando J. Espinosa de los Monteros F.</author>
+			<title>
+				This title is a random title about some Simulation.
+			</title>
+			<pages>825-831</pages>
+			<year>1997</year>
+			<crossref>conf/wsc/1997</crossref>
+			<booktitle>Winter Simulation Conference</booktitle>
+			<ee>
+				http://doi.ieeecomputersociety.org/10.1109/WSC.1997.640959
+			</ee>
+			<ee>http://doi.acm.org/10.1145/268437.268661</ee>
+			<url>db/conf/wsc/wsc1997.html#CerdaF97</url>
+		</inproceedings>
+	</article>
+		<article mdate="2015-04-14" key="journals/dem/test/mit4Teilen">
+		<inproceedings key="conf/wsc/CerdaF97" mdate="2015-06-03">
+			<author>Carlos B. Ramirez Cerda</author>
+			<author>Armando J. Espinosa de los Monteros F.</author>
+			<title>
+				This title is a random title about some Simulation.
+			</title>
+			<pages>825-831</pages>
+			<year>1997</year>
+			<crossref>conf/wsc/1997</crossref>
+			<booktitle>Winter Simulation Conference</booktitle>
+			<ee>
+				http://doi.ieeecomputersociety.org/10.1109/WSC.1997.640959
+			</ee>
+			<ee>http://doi.acm.org/10.1145/268437.268661</ee>
+			<url>db/conf/wsc/wsc1997.html#CerdaF97</url>
+		</inproceedings>
+	</article>
+</dblp>
