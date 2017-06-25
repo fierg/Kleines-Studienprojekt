@@ -111,7 +111,7 @@ int main(){
 					
 					/* TODO: Speichere die Wörter und ordne ihn dem letzten key zu */
 					
-					t = strtok(NULL, " ");
+					t = strtok(NULL, " .,;:<>/\\+*~#'^°!\"§$%&(){}[]?`´|-_");
 				}
 			}		
 		}
