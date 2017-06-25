@@ -51,34 +51,36 @@ int main(){
 			if (strstr(line, "<article") != NULL) {
 				if(debug)printf("line enthaelt article");
 				
-				/* <article wurde gefunden 
-					finde den index von 'key="' und erhöhe ihn um 5, um die 5 buchstaben key=" zu "überspringen", danach um 9, um journals/ zu überspringen */
-				char *substr = "key=\"";
-				int index = findSubstring(line, substr) + 5 + 9;
-				if(debug)printf(", index after key=\"journals/: %d\n", index);
-				
-				/* finde den index vom end-tag "> */
-				substr = "\">";
-				int endIndex = findSubstring(line, substr);
-				
-				/* setze den pointer von key auf den ersten Char nach journals/ */
-				key = &line[index];
-				
-				/* setze das Ende des Strings auf das " */
-				line[endIndex] = '\0';
+				/* <article wurde gefunden, teste ob es sich um ein journal handelt */
+				if(strstr(line, "key=\"journals/") != NULL){
+					/* finde den index von 'key="' und erhöhe ihn um 5, um die 5 buchstaben key=" zu "überspringen", danach um 9, um journals/ zu überspringen */
+					char *substr = "key=\"";
+					int index = findSubstring(line, substr) + 5 + 9;
+					if(debug)printf(", index after key=\"journals/: %d\n", index);
 
-				/* überprüfe ob key 3 Teile enthält */
-				if(findSubstring(key, "/") == -1){
-					/* no valid key */
-					break;
-				} else {
-					/* key hat das Format x/y/z */
-					/* setze das Ende so, dass key nurnoch y enthält und /z weggeschnitten wird */
-					key[findSubstring(key, "/")] = '\0';
-					printf("key: %s\n", key);
-					
-					/* ab hier enthält key nurnoch den validen Artikelnamen */
-					validArticle = 1;
+					/* finde den index vom end-tag "> */
+					substr = "\">";
+					int endIndex = findSubstring(line, substr);
+
+					/* setze den pointer von key auf den ersten Char nach journals/ */
+					key = &line[index];
+
+					/* setze das Ende des Strings auf das " */
+					line[endIndex] = '\0';
+
+					/* überprüfe ob key 3 Teile enthält */
+					if(findSubstring(key, "/") == -1){
+						/* no valid key */
+						break;
+					} else {
+						/* key hat das Format x/y/z */
+						/* setze das Ende so, dass key nurnoch y enthält und /z weggeschnitten wird */
+						key[findSubstring(key, "/")] = '\0';
+						printf("key: %s\n", key);
+
+						/* ab hier enthält key nurnoch den validen Artikelnamen */
+						validArticle = 1;
+					}
 				}
 			}
 		}else {
