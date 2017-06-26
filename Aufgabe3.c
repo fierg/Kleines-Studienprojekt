@@ -1,10 +1,93 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <time.h>
 #include <search.h>
 
-static const int MAX_HASH_SIZE = 5000;
-static const int MIN_ARTICLE_SIZE = 500;
+static const int MIN_ARTICLE_SIZE = 300;
+
+struct node {
+	char		*w;
+	int	 	count;
+	struct node	*l, *r;
+} *tree;
+
+
+void incr(struct node **root, char *w) {
+	if (root == NULL || w == NULL)
+		return;
+	if (*root == NULL) {
+		struct node *n;
+		int l = strlen(w);
+
+		n = (struct node *) malloc(sizeof(struct node));
+		if (n == NULL)
+			return;
+		n->w = (char *) malloc(l+1);
+		if (n->w == NULL)
+			return;
+		strcpy(n->w,w);
+		n->count = 1;
+		n->l = NULL;
+		n->r = NULL;
+
+		*root = n;
+		return;
+	}
+	int c = strcmp((*root)->w,w);
+	if (c == 0) {
+		((*root)->count)++;
+		return;
+	}
+	if (c < 0)
+		incr(&((*root)->r),w);
+	else
+		incr(&((*root)->l),w);
+}
+
+/* traverse checkt ob count > 50 und schreibt direkt ins file */
+void traverse(struct node *r, char *key, FILE *fp) {
+	if (r == NULL)
+		return;
+	
+	traverse(r->l, key, fp);
+	char str[128];
+	sprintf(str, "%d", r->count);
+	fwrite(str, sizeof(char) * strlen(str), 1, fp);
+	fwrite(" ", sizeof(char), 1, fp);
+	fwrite(r->w, sizeof(char) * strlen(r->w), 1, fp);
+	fwrite("\n", sizeof(char), 1, fp);
+	fflush(fp);
+
+	traverse(r->r, key, fp);
+}
+
+
+void words(char *s)
+{
+	int state = 0;
+	char c;
+	char *start;
+
+	while (c = *s) {
+		if (isalpha(c)) {
+			if (!state) {
+				start = s;
+				state = 1;
+			}
+		} else {
+			state = 0;
+			if (start) {
+				*s = '\0';
+				incr(&tree,start);
+				*s = c;
+			}
+			start = NULL;
+		}
+		s++;
+	}
+}
 
 int findSubstring(char *str, char *substr) {
 	int i = 0;
@@ -30,26 +113,30 @@ int main() {
 	FILE *fp;
 	char line[1024];
 	int debug = 0;
-
+	
 
 	/* öffne dblp.xml zum lesen */
-	fp = fopen("dblp_smallTest.xml", "r");
+	fp = fopen("dblp.xml", "r");
 	if (fp == NULL) {
 		perror("Error opening file");
 		return (-1);
 	}
 	/* TODO: Geeignete Datenstruktur zum speichern von den Keys und den zugehörigen Titeln anlegen */
-	ENTRY titleToken;
-	ENTRY *searchTitelToken;
-	(void) hcreate(MAX_HASH_SIZE);
+	//ENTRY titleToken;
+	//ENTRY *searchTitleToken=malloc(sizeof(ENTRY));
+	//(void) hcreate(MAX_HASH_SIZE);
+
+	tree = NULL;
+
 	/* validArticle wird auf 1 gestzt, sobald ein key="x/y/z" Attribut gefunden wurde.
 	 Ist validArticle == 1, so wird bei jeder neuen line statt nach einem "<article" nach einem "<title>" gesucht */
 	int validArticle = 0;
 
-	char *title;
-	char *key;
-	char lastkey[] = (char*) malloc((128 * sizeof(char));
+	char *title = (char *) malloc(sizeof(char) * 512);
+	char *key = (char *) malloc(sizeof(char) * 32);
+	char *lastkey = (char *) malloc(sizeof(char) * 32);
 
+	int journals = 0;
 	/* lies Zeile für Zeile */
 	while (fgets(line, 1024, fp) != NULL) {
 		if (debug)
@@ -82,20 +169,47 @@ int main() {
 					/* überprüfe ob key 3 Teile enthält */
 					if (findSubstring(key, "/") == -1) {
 						/* no valid key */
+						lastkey = NULL;
 						break;
 					} else {
 						/* key hat das Format x/y/z */
 						/* setze das Ende so, dass key nurnoch y enthält und /z weggeschnitten wird */
 						key[findSubstring(key, "/")] = '\0';
-						printf("key: %s\n", key);
-
-						/*int idx = 0;
-						while (*key != '\0')
-						lastkey[idx++] = *ptr++;
-						letzten publisher merken und aktuellen publisher vergleichen. bei neuem publisher hashmap in datei schreiben*/
+						if(debug)printf("key: %s\n", key);
+						
+						if(lastkey == NULL){
+							strcpy(lastkey, key);
+						} else {
+							if(strcmp(lastkey, key) == 0){
+								journals++;
+								/* behalte tree bei, selber key */
+							} else {
+								/* TODO: lege neuen tree an und printe alten */
+								if(journals >= MIN_ARTICLE_SIZE){
+									FILE *fpOut;
+									char *concat = malloc(strlen(key) * sizeof(char) + 17 * sizeof(char));
+									strcpy(concat, "./wordcloud/");
+									strcat(concat, key);
+									strcat(concat, ".txt");
+									fpOut = fopen(concat, "wb");
+									if (fpOut == NULL) {
+										perror("Error opening file");
+										return;
+									}
+									traverse(tree, lastkey, fpOut);
+									printf("exported tree to %s\n", concat);
+									free(concat);
+									fclose(fpOut);
+									tree=NULL;
+									journals = 0;
+								}
+								strcpy(lastkey, key);
+							}
+						}
 
 						/* ab hier enthält key nurnoch den validen Artikelnamen */
 						validArticle = 1;
+						
 					}
 				}
 			}
@@ -113,37 +227,37 @@ int main() {
 				line[index] = '\0';
 
 				/* lasse *title auf den Anfang des Titels zeigen */
-				title = &line[11];
-				printf("title: %s\n", title);
+				title = &line[10];
+				if(debug)printf("title: %s\n", title);
 
 				validArticle = 0;
 				/* setze validArticle wieder auf 0, damit nach "<article" gesucht wird */
 
-				/* Ab hier enthält Key den gesamten Artikelstring x/y/z und title den zugehörigen Titel */
-				/* tokenize: */
-				char *t = strtok(title, " .,;:<>/\\+*~#'^°!\"§$%&(){}[]?`´|-_");
-				while (t != NULL) {
-					printf("token: %s\n", t);
+				/* Ab hier enthält Key den Artikelnamen und title den zugehörigen Titel */
+				
+				words(title);
 
-					/* TODO: Speichere die Wörter und ordne ihn dem letzten key zu */
-
-					t = strtok(NULL, " .,;:<>/\\+*~#'^°!\"§$%&(){}[]?`´|-_");
-					titleToken.key = t;
-					searchTitelToken = hsearch(titleToken, FIND);
-					if (searchTitelToken == NULL) {
-						titleToken.data = (void *) 1;
-						searchTitelToken = hsearch(titleToken, ENTER);
-						if(searchTitelToken== NULL){
-							fprintf(stderr,"entry failed");
-						}
-					} else {
-					//	searchTitelToken.data = (void*)((int) searchTitelToken->data) +1;
-					}
-					printf("hashed token key: %s , count: %d\n", searchTitelToken->key,(int)searchTitelToken->data);
-				}
 			}
 		}
 
+	}
+	if(validArticle && journals >= MIN_ARTICLE_SIZE){
+		FILE *fpOut;
+		char *concat = malloc(strlen(key) * sizeof(char) + 17 * sizeof(char));
+		strcpy(concat, "./wordcloud/");
+		strcat(concat, key);
+		strcat(concat, ".txt");
+		//printf("concat: %s\n", concat);
+		fpOut = fopen(concat, "wb");
+		if (fpOut == NULL) {
+			perror("Error opening file");
+			printf("last record, key: %s", key);
+			return;
+		}
+		traverse(tree, lastkey, fpOut);
+		printf("exported tree to %s\n", concat);
+		fclose(fpOut);
+		free(concat);
 	}
 	fclose(fp);
 
